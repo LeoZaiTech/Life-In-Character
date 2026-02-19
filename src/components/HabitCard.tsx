@@ -71,8 +71,8 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   actionButton: {
-    width: 36,
-    height: 36,
+    width: 56,
+    height: 56,
     borderRadius: BORDER_RADIUS.md,
     justifyContent: 'center',
     alignItems: 'center',
@@ -93,7 +93,7 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.xs,
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.sm,
-    minWidth: 32,
+    minWidth: 48,
     alignItems: 'center',
   },
   scoreText: {

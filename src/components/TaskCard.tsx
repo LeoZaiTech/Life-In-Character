@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   accentBar: {
-    width: 6,
+    width: 10,
     alignSelf: 'stretch',
   },
   leftContent: {

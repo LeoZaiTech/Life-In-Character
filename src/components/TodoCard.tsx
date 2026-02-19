@@ -50,10 +50,10 @@ export const TodoCard: React.FC<TodoCardProps> = ({
 
 const styles = StyleSheet.create({
   checkbox: {
-    width: 28,
-    height: 28,
+    width: 44,
+    height: 44,
     borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 2,
+    borderWidth: 3,
     borderColor: COLORS.todoActive,
     justifyContent: 'center',
     alignItems: 'center',

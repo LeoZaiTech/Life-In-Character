@@ -87,7 +87,7 @@ const styles = StyleSheet.create({
     gap: SPACING.xs,
   },
   barWrapper: {
-    gap: 2,
+    gap: 4,
   },
   barLabelRow: {
     flexDirection: 'row',
@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.xs,
   },
   barBackground: {
-    height: 8,
+    height: 16,
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.sm,
     overflow: 'hidden',

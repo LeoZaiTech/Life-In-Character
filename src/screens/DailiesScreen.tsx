@@ -172,7 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.lg,
     width: '90%',
-    maxWidth: 400,
+    maxWidth: 500,
   },
   modalTitle: {
     fontSize: FONT_SIZES.xl,
@@ -204,8 +204,8 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   dayButton: {
-    width: 40,
-    height: 40,
+    width: 52,
+    height: 52,
     borderRadius: BORDER_RADIUS.full,
     backgroundColor: COLORS.surfaceLight,
     justifyContent: 'center',

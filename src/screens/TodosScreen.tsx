@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
     borderRadius: BORDER_RADIUS.lg,
     padding: SPACING.lg,
     width: '90%',
-    maxWidth: 400,
+    maxWidth: 500,
   },
   modalTitle: {
     fontSize: FONT_SIZES.xl,

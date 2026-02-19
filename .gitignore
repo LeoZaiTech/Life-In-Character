@@ -42,3 +42,7 @@ yarn-error.*
 
 # personal docs/notes
 /docs/
+docs/BRAINSTORM.md
+docs/PRIMARY_CRITERIA.md
+docs/PROGRESS_TRACKER.md
+docs/challenges/

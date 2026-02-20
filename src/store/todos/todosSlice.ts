@@ -7,7 +7,30 @@ interface TodosState {
 }
 
 const initialState: TodosState = {
-  items: [],
+  items: [
+    {
+      id: 'demo-todo-1',
+      title: 'Prepare interview demo',
+      notes: 'Make sure app runs smoothly',
+      completed: true,
+      createdAt: '2026-02-18T10:00:00.000Z',
+    },
+    {
+      id: 'demo-todo-2',
+      title: 'Review Redux patterns',
+      notes: 'Slices, selectors, async thunks',
+      completed: false,
+      createdAt: '2026-02-19T10:00:00.000Z',
+    },
+    {
+      id: 'demo-todo-3',
+      title: 'Buy groceries',
+      notes: 'Milk, eggs, bread, vegetables',
+      completed: false,
+      dueDate: '2026-02-21',
+      createdAt: '2026-02-19T14:00:00.000Z',
+    },
+  ],
 };
 
 const todosSlice = createSlice({

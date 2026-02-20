@@ -7,7 +7,41 @@ interface HabitsState {
 }
 
 const initialState: HabitsState = {
-  items: [],
+  items: [
+    {
+      id: 'demo-habit-1',
+      title: 'Drink Water',
+      notes: 'Stay hydrated throughout the day',
+      positive: true,
+      negative: false,
+      score: 5,
+      positiveCount: 5,
+      negativeCount: 0,
+      createdAt: '2026-02-15T10:00:00.000Z',
+    },
+    {
+      id: 'demo-habit-2',
+      title: 'Social Media',
+      notes: 'Track mindless scrolling',
+      positive: false,
+      negative: true,
+      score: -3,
+      positiveCount: 0,
+      negativeCount: 3,
+      createdAt: '2026-02-15T10:00:00.000Z',
+    },
+    {
+      id: 'demo-habit-3',
+      title: 'Take the Stairs',
+      notes: 'Choose stairs over elevator',
+      positive: true,
+      negative: true,
+      score: 2,
+      positiveCount: 4,
+      negativeCount: 2,
+      createdAt: '2026-02-16T10:00:00.000Z',
+    },
+  ],
 };
 
 const habitsSlice = createSlice({

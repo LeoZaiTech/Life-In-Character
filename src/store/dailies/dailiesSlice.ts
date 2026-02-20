@@ -8,7 +8,36 @@ interface DailiesState {
 }
 
 const initialState: DailiesState = {
-  items: [],
+  items: [
+    {
+      id: 'demo-daily-1',
+      title: 'Morning Workout',
+      notes: '30 minutes of exercise',
+      isCompletedToday: false,
+      streak: 7,
+      schedule: { repeatDays: [1, 2, 3, 4, 5] },
+      createdAt: '2026-02-10T08:00:00.000Z',
+    },
+    {
+      id: 'demo-daily-2',
+      title: 'Read for 20 minutes',
+      notes: 'Fiction or non-fiction',
+      isCompletedToday: true,
+      streak: 12,
+      schedule: { repeatDays: [0, 1, 2, 3, 4, 5, 6] },
+      lastCompletedDate: new Date().toISOString(),
+      createdAt: '2026-02-05T08:00:00.000Z',
+    },
+    {
+      id: 'demo-daily-3',
+      title: 'Practice Coding',
+      notes: 'LeetCode or side project',
+      isCompletedToday: false,
+      streak: 3,
+      schedule: { repeatDays: [1, 2, 3, 4, 5] },
+      createdAt: '2026-02-12T08:00:00.000Z',
+    },
+  ],
   lastResetDate: null,
 };
 

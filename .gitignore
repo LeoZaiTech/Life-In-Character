@@ -40,9 +40,10 @@ yarn-error.*
 /ios
 /android
 
-# personal docs/notes
-/docs/
+# personal docs/notes (temporarily disabled for editing)
+# /docs/
 docs/BRAINSTORM.md
 docs/PRIMARY_CRITERIA.md
 docs/PROGRESS_TRACKER.md
+docs/PROCESS_LOG.md
 docs/challenges/

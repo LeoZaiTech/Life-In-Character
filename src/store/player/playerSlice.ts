@@ -7,10 +7,10 @@ interface PlayerState {
 
 const initialState: PlayerState = {
   stats: {
-    xp: 0,
-    level: 1,
-    gold: 0,
-    health: 50,
+    xp: 245,
+    level: 3,
+    gold: 87,
+    health: 42,
     maxHealth: 50,
   },
 };

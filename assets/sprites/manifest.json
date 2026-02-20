@@ -1,0 +1,69 @@
+{
+  "name": "sprites-optimized",
+  "version": "1.0.0",
+  "description": "Curated sprite set for React Native avatar implementation",
+  "totalSprites": 462,
+  "spriteSize": "90x90",
+  "format": "PNG",
+  "categories": {
+    "skin": {
+      "count": 30,
+      "description": "Body/skin sprites",
+      "groups": {
+        "natural": ["ddc994", "f5a76e", "ea8349", "c06534", "98461a", "915533", "c3e1dc", "6bd049"],
+        "rainbow": ["eb052b", "f69922", "f5d70f", "0ff591", "2b43f6", "d7a9f7", "800ed0", "rainbow"],
+        "animal": ["bear", "fox", "lion", "panda", "tiger", "wolf"],
+        "special": ["zombie", "skeleton", "ghost", "shadow", "merblue", "snowy", "sugar", "aurora"]
+      }
+    },
+    "hair": {
+      "count": 96,
+      "description": "Hair sprites (base, bangs, beard, mustache, flowers)",
+      "types": {
+        "base": { "styles": [1,2,3,4,5,6,7,8,9,10], "colors": ["white","brown","blond","red","black"] },
+        "bangs": { "styles": [1,2,3,4], "colors": ["white","brown","blond","red","black"] },
+        "beard": { "styles": [1,2], "colors": ["white","brown","blond","red","black"] },
+        "mustache": { "styles": [1,2], "colors": ["white","brown","blond","red","black"] },
+        "flower": { "ids": [1,2,3,4,5,6] }
+      }
+    },
+    "head": {
+      "count": 200,
+      "description": "Helmets and headgear",
+      "includes": ["head_0 (base)", "class gear (warrior/rogue/healer/wizard 1-5)", "special event items"]
+    },
+    "shirt": {
+      "count": 34,
+      "description": "All shirt colors for both body types",
+      "sizes": ["slim", "broad"]
+    },
+    "armor": {
+      "count": 102,
+      "description": "Body armor sets",
+      "sizes": ["slim", "broad"],
+      "includes": ["class sets", "special items"]
+    }
+  },
+  "bodySizes": ["slim", "broad"],
+  "hairColors": ["white", "brown", "blond", "red", "black"],
+  "layerOrder": [
+    "skin",
+    "shirt", 
+    "head_0",
+    "armor",
+    "hair_bangs",
+    "hair_base",
+    "hair_beard",
+    "hair_mustache",
+    "head_gear",
+    "hair_flower"
+  ],
+  "defaultCharacter": {
+    "skin": "915533",
+    "size": "slim",
+    "shirt": "blue",
+    "hairBase": 3,
+    "hairBangs": 1,
+    "hairColor": "brown"
+  }
+}

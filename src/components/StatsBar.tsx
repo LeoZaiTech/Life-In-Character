@@ -3,17 +3,22 @@ import { View, Text, StyleSheet } from 'react-native';
 import { useAppSelector } from '../store/hooks';
 import { selectPlayerStats, selectXPProgress } from '../store/player/playerSelectors';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { CharacterAvatar } from './CharacterAvatar';
 
 export const StatsBar: React.FC = () => {
   const stats = useAppSelector(selectPlayerStats);
   const xpProgress = useAppSelector(selectXPProgress);
+  const characterConfig = useAppSelector((state) => state.character.config);
 
   const healthPercent = (stats.health / stats.maxHealth) * 100;
 
   return (
     <View style={styles.container}>
-      <View style={styles.levelBadge}>
-        <Text style={styles.levelText}>Lv {stats.level}</Text>
+      <View style={styles.avatarContainer}>
+        <CharacterAvatar config={characterConfig} size={80} />
+        <View style={styles.levelBadge}>
+          <Text style={styles.levelText}>Lv {stats.level}</Text>
+        </View>
       </View>
 
       <View style={styles.barsContainer}>
@@ -70,12 +75,16 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  avatarContainer: {
+    alignItems: 'center',
+    marginRight: SPACING.md,
+  },
   levelBadge: {
     backgroundColor: COLORS.primary,
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     borderRadius: BORDER_RADIUS.md,
-    marginRight: SPACING.md,
+    marginTop: -SPACING.sm,
   },
   levelText: {
     color: COLORS.text,

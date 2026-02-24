@@ -52,6 +52,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
         </TouchableOpacity>
       )}
       <View style={styles.scoreContainer}>
+        <Text style={styles.scoreIcon}>⚡</Text>
         <Text style={styles.scoreText}>{habit.score}</Text>
       </View>
       {onEdit && onDelete && (
@@ -97,12 +98,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   scoreContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: SPACING.sm,
     paddingVertical: SPACING.xs,
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.sm,
     minWidth: 48,
-    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  scoreIcon: {
+    fontSize: FONT_SIZES.sm,
   },
   scoreText: {
     color: COLORS.textSecondary,

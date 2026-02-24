@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllDailies } from '../store/dailies/dailiesSelectors';
-import { addDaily, toggleDailyComplete, deleteDaily, resetDailies } from '../store/dailies/dailiesSlice';
+import { addDaily, toggleDailyComplete, deleteDaily, resetDailies, updateDaily } from '../store/dailies/dailiesSlice';
 import { completeDaily } from '../store/player/playerSlice';
 import { DailyCard, AddButton } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
@@ -25,6 +25,7 @@ export const DailiesScreen: React.FC = () => {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
+  const [editingDaily, setEditingDaily] = useState<Daily | null>(null);
 
   useEffect(() => {
     dispatch(resetDailies());
@@ -32,16 +33,40 @@ export const DailiesScreen: React.FC = () => {
 
   const handleAddDaily = () => {
     if (title.trim()) {
-      dispatch(addDaily({
-        title: title.trim(),
-        notes: notes.trim() || undefined,
-        schedule: { repeatDays: selectedDays },
-      }));
-      setTitle('');
-      setNotes('');
-      setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
-      setModalVisible(false);
+      if (editingDaily) {
+        dispatch(updateDaily({
+          id: editingDaily.id,
+          updates: {
+            title: title.trim(),
+            notes: notes.trim() || undefined,
+            schedule: { repeatDays: selectedDays },
+          },
+        }));
+      } else {
+        dispatch(addDaily({
+          title: title.trim(),
+          notes: notes.trim() || undefined,
+          schedule: { repeatDays: selectedDays },
+        }));
+      }
+      resetForm();
     }
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setNotes('');
+    setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
+    setEditingDaily(null);
+    setModalVisible(false);
+  };
+
+  const handleEdit = (daily: Daily) => {
+    setEditingDaily(daily);
+    setTitle(daily.title);
+    setNotes(daily.notes || '');
+    setSelectedDays(daily.schedule.repeatDays);
+    setModalVisible(true);
   };
 
   const handleToggleComplete = (dailyId: string, wasCompleted: boolean) => {
@@ -67,7 +92,8 @@ export const DailiesScreen: React.FC = () => {
     <DailyCard
       daily={item}
       onToggleComplete={() => handleToggleComplete(item.id, item.isCompletedToday)}
-      onPress={() => handleDelete(item.id)}
+      onEdit={() => handleEdit(item)}
+      onDelete={() => handleDelete(item.id)}
     />
   );
 
@@ -90,7 +116,7 @@ export const DailiesScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New Daily</Text>
+            <Text style={styles.modalTitle}>{editingDaily ? 'Edit Daily' : 'New Daily'}</Text>
 
             <TextInput
               style={styles.input}
@@ -135,7 +161,7 @@ export const DailiesScreen: React.FC = () => {
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
+                onPress={resetForm}
               >
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>

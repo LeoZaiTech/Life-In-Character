@@ -2,18 +2,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Todo } from '../types';
 import { TaskCard } from './TaskCard';
+import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
 interface TodoCardProps {
   todo: Todo;
   onToggleComplete: () => void;
   onPress?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const TodoCard: React.FC<TodoCardProps> = ({
   todo,
   onToggleComplete,
   onPress,
+  onEdit,
+  onDelete,
 }) => {
   const accentColor = todo.completed ? COLORS.todoComplete : COLORS.todoActive;
 
@@ -37,6 +42,11 @@ export const TodoCard: React.FC<TodoCardProps> = ({
 
   const dueDate = formatDueDate();
 
+  const renderRightContent = () => {
+    if (!onEdit || !onDelete) return null;
+    return <TaskOptionsMenu onEdit={onEdit} onDelete={onDelete} />;
+  };
+
   return (
     <TaskCard
       title={todo.title}
@@ -44,6 +54,7 @@ export const TodoCard: React.FC<TodoCardProps> = ({
       accentColor={accentColor}
       onPress={onPress}
       leftContent={renderLeftContent()}
+      rightContent={renderRightContent()}
     />
   );
 };

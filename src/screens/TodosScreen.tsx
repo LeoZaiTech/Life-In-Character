@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllTodos } from '../store/todos/todosSelectors';
-import { addTodo, toggleTodoComplete, deleteTodo } from '../store/todos/todosSlice';
+import { addTodo, toggleTodoComplete, deleteTodo, updateTodo } from '../store/todos/todosSlice';
 import { completeTodo } from '../store/player/playerSlice';
 import { TodoCard, AddButton } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
@@ -25,6 +25,7 @@ export const TodosScreen: React.FC = () => {
   const [title, setTitle] = useState('');
   const [notes, setNotes] = useState('');
   const [filter, setFilter] = useState<FilterType>('active');
+  const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
 
   const filteredTodos = allTodos.filter((todo) => {
     if (filter === 'active') return !todo.completed;
@@ -34,14 +35,36 @@ export const TodosScreen: React.FC = () => {
 
   const handleAddTodo = () => {
     if (title.trim()) {
-      dispatch(addTodo({
-        title: title.trim(),
-        notes: notes.trim() || undefined,
-      }));
-      setTitle('');
-      setNotes('');
-      setModalVisible(false);
+      if (editingTodo) {
+        dispatch(updateTodo({
+          id: editingTodo.id,
+          updates: {
+            title: title.trim(),
+            notes: notes.trim() || undefined,
+          },
+        }));
+      } else {
+        dispatch(addTodo({
+          title: title.trim(),
+          notes: notes.trim() || undefined,
+        }));
+      }
+      resetForm();
     }
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setNotes('');
+    setEditingTodo(null);
+    setModalVisible(false);
+  };
+
+  const handleEdit = (todo: Todo) => {
+    setEditingTodo(todo);
+    setTitle(todo.title);
+    setNotes(todo.notes || '');
+    setModalVisible(true);
   };
 
   const handleToggleComplete = (todoId: string, wasCompleted: boolean) => {
@@ -59,7 +82,8 @@ export const TodosScreen: React.FC = () => {
     <TodoCard
       todo={item}
       onToggleComplete={() => handleToggleComplete(item.id, item.completed)}
-      onPress={() => handleDelete(item.id)}
+      onEdit={() => handleEdit(item)}
+      onDelete={() => handleDelete(item.id)}
     />
   );
 
@@ -96,7 +120,7 @@ export const TodosScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New To-Do</Text>
+            <Text style={styles.modalTitle}>{editingTodo ? 'Edit To-Do' : 'New To-Do'}</Text>
 
             <TextInput
               style={styles.input}
@@ -118,7 +142,7 @@ export const TodosScreen: React.FC = () => {
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
+                onPress={resetForm}
               >
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>

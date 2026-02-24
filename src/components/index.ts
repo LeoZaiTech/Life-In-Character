@@ -6,3 +6,4 @@ export { StatsBar } from './StatsBar';
 export { AddButton } from './AddButton';
 export { ErrorBoundary } from './ErrorBoundary';
 export { CharacterAvatar } from './CharacterAvatar';
+export { TaskOptionsMenu } from './TaskOptionsMenu';

@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllHabits } from '../store/habits/habitsSelectors';
-import { addHabit, incrementHabit, decrementHabit, deleteHabit } from '../store/habits/habitsSlice';
+import { addHabit, incrementHabit, decrementHabit, deleteHabit, updateHabit } from '../store/habits/habitsSlice';
 import { completePositiveHabit, completeNegativeHabit } from '../store/player/playerSlice';
 import { HabitCard, AddButton } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
@@ -25,16 +25,38 @@ export const HabitsScreen: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [positive, setPositive] = useState(true);
   const [negative, setNegative] = useState(true);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
 
   const handleAddHabit = () => {
     if (title.trim()) {
-      dispatch(addHabit({ title: title.trim(), notes: notes.trim() || undefined, positive, negative }));
-      setTitle('');
-      setNotes('');
-      setPositive(true);
-      setNegative(true);
-      setModalVisible(false);
+      if (editingHabit) {
+        dispatch(updateHabit({
+          id: editingHabit.id,
+          updates: { title: title.trim(), notes: notes.trim() || undefined, positive, negative },
+        }));
+      } else {
+        dispatch(addHabit({ title: title.trim(), notes: notes.trim() || undefined, positive, negative }));
+      }
+      resetForm();
     }
+  };
+
+  const resetForm = () => {
+    setTitle('');
+    setNotes('');
+    setPositive(true);
+    setNegative(true);
+    setEditingHabit(null);
+    setModalVisible(false);
+  };
+
+  const handleEdit = (habit: Habit) => {
+    setEditingHabit(habit);
+    setTitle(habit.title);
+    setNotes(habit.notes || '');
+    setPositive(habit.positive);
+    setNegative(habit.negative);
+    setModalVisible(true);
   };
 
   const handleIncrement = (habitId: string) => {
@@ -56,7 +78,8 @@ export const HabitsScreen: React.FC = () => {
       habit={item}
       onIncrement={() => handleIncrement(item.id)}
       onDecrement={() => handleDecrement(item.id)}
-      onPress={() => handleDelete(item.id)}
+      onEdit={() => handleEdit(item)}
+      onDelete={() => handleDelete(item.id)}
     />
   );
 
@@ -79,7 +102,7 @@ export const HabitsScreen: React.FC = () => {
       >
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>New Habit</Text>
+            <Text style={styles.modalTitle}>{editingHabit ? 'Edit Habit' : 'New Habit'}</Text>
 
             <TextInput
               style={styles.input}
@@ -119,7 +142,7 @@ export const HabitsScreen: React.FC = () => {
             <View style={styles.buttonRow}>
               <TouchableOpacity
                 style={[styles.button, styles.cancelButton]}
-                onPress={() => setModalVisible(false)}
+                onPress={resetForm}
               >
                 <Text style={styles.buttonText}>Cancel</Text>
               </TouchableOpacity>

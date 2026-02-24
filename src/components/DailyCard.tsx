@@ -2,18 +2,23 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Daily } from '../types';
 import { TaskCard } from './TaskCard';
+import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
 interface DailyCardProps {
   daily: Daily;
   onToggleComplete: () => void;
   onPress?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const DailyCard: React.FC<DailyCardProps> = ({
   daily,
   onToggleComplete,
   onPress,
+  onEdit,
+  onDelete,
 }) => {
   const accentColor = daily.isCompletedToday ? COLORS.dailyComplete : COLORS.dailyActive;
 
@@ -30,12 +35,17 @@ export const DailyCard: React.FC<DailyCardProps> = ({
   );
 
   const renderRightContent = () => (
-    <View style={styles.streakContainer}>
-      {daily.streak > 0 && (
-        <>
-          <Text style={styles.streakIcon}>🔥</Text>
-          <Text style={styles.streakText}>{daily.streak}</Text>
-        </>
+    <View style={styles.rightContainer}>
+      <View style={styles.streakContainer}>
+        {daily.streak > 0 && (
+          <>
+            <Text style={styles.streakIcon}>🔥</Text>
+            <Text style={styles.streakText}>{daily.streak}</Text>
+          </>
+        )}
+      </View>
+      {onEdit && onDelete && (
+        <TaskOptionsMenu onEdit={onEdit} onDelete={onDelete} />
       )}
     </View>
   );
@@ -77,6 +87,10 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
+  },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   streakContainer: {
     flexDirection: 'row',

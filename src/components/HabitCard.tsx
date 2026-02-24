@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Habit } from '../types';
 import { TaskCard } from './TaskCard';
+import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
 interface HabitCardProps {
@@ -9,6 +10,8 @@ interface HabitCardProps {
   onIncrement: () => void;
   onDecrement: () => void;
   onPress?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }
 
 export const HabitCard: React.FC<HabitCardProps> = ({
@@ -16,6 +19,8 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   onIncrement,
   onDecrement,
   onPress,
+  onEdit,
+  onDelete,
 }) => {
   const getAccentColor = () => {
     if (habit.positive && habit.negative) return COLORS.habitBoth;
@@ -49,6 +54,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({
       <View style={styles.scoreContainer}>
         <Text style={styles.scoreText}>{habit.score}</Text>
       </View>
+      {onEdit && onDelete && (
+        <TaskOptionsMenu onEdit={onEdit} onDelete={onDelete} />
+      )}
     </View>
   );
 

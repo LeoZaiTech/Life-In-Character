@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useAppSelector } from '../store/hooks';
 import { selectPlayerStats, selectXPProgress } from '../store/player/playerSelectors';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
@@ -58,7 +59,7 @@ export const StatsBar: React.FC = () => {
       </View>
 
       <View style={styles.goldContainer}>
-        <Text style={styles.goldIcon}>🪙</Text>
+        <FontAwesome5 name="coins" size={24} color={COLORS.gold} />
         <Text style={styles.goldText}>{stats.gold}</Text>
       </View>
     </View>
@@ -132,10 +133,7 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.md,
     gap: SPACING.xs,
   },
-  goldIcon: {
-    fontSize: FONT_SIZES.md,
-  },
-  goldText: {
+    goldText: {
     color: COLORS.gold,
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',

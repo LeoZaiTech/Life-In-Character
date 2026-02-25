@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { Daily } from '../types';
 import { TaskCard } from './TaskCard';
 import { TaskOptionsMenu } from './TaskOptionsMenu';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { Checkbox } from './Checkbox';
+import { COLORS, SPACING, FONT_SIZES } from '../constants/theme';
 
 interface DailyCardProps {
   daily: Daily;
@@ -23,15 +24,12 @@ export const DailyCard: React.FC<DailyCardProps> = ({
   const accentColor = daily.isCompletedToday ? COLORS.dailyComplete : COLORS.dailyActive;
 
   const renderLeftContent = () => (
-    <TouchableOpacity
-      style={[
-        styles.checkbox,
-        daily.isCompletedToday && styles.checkboxChecked,
-      ]}
-      onPress={onToggleComplete}
-    >
-      {daily.isCompletedToday && <Text style={styles.checkmark}>✓</Text>}
-    </TouchableOpacity>
+    <Checkbox
+      checked={daily.isCompletedToday}
+      onToggle={onToggleComplete}
+      color={COLORS.dailyActive}
+      checkedColor={COLORS.dailyComplete}
+    />
   );
 
   const renderRightContent = () => (
@@ -70,24 +68,6 @@ export const DailyCard: React.FC<DailyCardProps> = ({
 };
 
 const styles = StyleSheet.create({
-  checkbox: {
-    width: 44,
-    height: 44,
-    borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 3,
-    borderColor: COLORS.dailyActive,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: COLORS.dailyComplete,
-    borderColor: COLORS.dailyComplete,
-  },
-  checkmark: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.md,
-    fontWeight: 'bold',
-  },
   rightContainer: {
     flexDirection: 'row',
     alignItems: 'center',

@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Todo } from '../types';
 import { TaskCard } from './TaskCard';
 import { TaskOptionsMenu } from './TaskOptionsMenu';
-import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
+import { Checkbox } from './Checkbox';
+import { COLORS } from '../constants/theme';
 
 interface TodoCardProps {
   todo: Todo;
@@ -23,15 +23,12 @@ export const TodoCard: React.FC<TodoCardProps> = ({
   const accentColor = todo.completed ? COLORS.todoComplete : COLORS.todoActive;
 
   const renderLeftContent = () => (
-    <TouchableOpacity
-      style={[
-        styles.checkbox,
-        todo.completed && styles.checkboxChecked,
-      ]}
-      onPress={onToggleComplete}
-    >
-      {todo.completed && <Text style={styles.checkmark}>✓</Text>}
-    </TouchableOpacity>
+    <Checkbox
+      checked={todo.completed}
+      onToggle={onToggleComplete}
+      color={COLORS.todoActive}
+      checkedColor={COLORS.todoComplete}
+    />
   );
 
   const formatDueDate = () => {
@@ -58,24 +55,3 @@ export const TodoCard: React.FC<TodoCardProps> = ({
     />
   );
 };
-
-const styles = StyleSheet.create({
-  checkbox: {
-    width: 44,
-    height: 44,
-    borderRadius: BORDER_RADIUS.sm,
-    borderWidth: 3,
-    borderColor: COLORS.todoActive,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  checkboxChecked: {
-    backgroundColor: COLORS.todoComplete,
-    borderColor: COLORS.todoComplete,
-  },
-  checkmark: {
-    color: COLORS.text,
-    fontSize: FONT_SIZES.md,
-    fontWeight: 'bold',
-  },
-});

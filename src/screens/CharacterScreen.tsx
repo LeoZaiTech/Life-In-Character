@@ -24,6 +24,12 @@ export const CharacterScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const config = useAppSelector((state) => state.character.config);
   const [activeCategory, setActiveCategory] = useState<CategoryKey>('skin');
+  const [showSaved, setShowSaved] = useState(false);
+
+  const handleSave = () => {
+    setShowSaved(true);
+    setTimeout(() => setShowSaved(false), 2000);
+  };
 
   const categories: { key: CategoryKey; label: string }[] = [
     { key: 'skin', label: '👤 Skin' },
@@ -297,6 +303,18 @@ export const CharacterScreen: React.FC = () => {
       <ScrollView style={styles.scrollContainer}>
         {renderOptions()}
       </ScrollView>
+
+      <View style={styles.footer}>
+        <TouchableOpacity
+          style={[styles.saveButton, showSaved && styles.saveButtonSaved]}
+          onPress={handleSave}
+          disabled={showSaved}
+        >
+          <Text style={styles.saveButtonText}>
+            {showSaved ? '✓ Saved!' : 'Save Character'}
+          </Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -431,5 +449,25 @@ const styles = StyleSheet.create({
   },
   selectedBodyOptionText: {
     color: COLORS.text,
+  },
+  footer: {
+    padding: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  saveButton: {
+    backgroundColor: COLORS.primary,
+    paddingVertical: SPACING.md,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+  },
+  saveButtonSaved: {
+    backgroundColor: COLORS.success,
+  },
+  saveButtonText: {
+    color: COLORS.text,
+    fontSize: FONT_SIZES.md,
+    fontWeight: 'bold',
   },
 });

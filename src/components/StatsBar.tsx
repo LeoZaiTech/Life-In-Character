@@ -16,7 +16,7 @@ export const StatsBar: React.FC = () => {
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        <CharacterAvatar config={characterConfig} size={80} />
+        <CharacterAvatar config={characterConfig} size={120} />
         <View style={styles.levelBadge}>
           <Text style={styles.levelText}>Lv {stats.level}</Text>
         </View>
@@ -59,7 +59,7 @@ export const StatsBar: React.FC = () => {
       </View>
 
       <View style={styles.goldContainer}>
-        <FontAwesome5 name="coins" size={24} color={COLORS.gold} />
+        <FontAwesome5 name="coins" size={36} color={COLORS.gold} />
         <Text style={styles.goldText}>{stats.gold}</Text>
       </View>
     </View>
@@ -71,33 +71,33 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.surface,
-    paddingHorizontal: SPACING.md,
-    paddingVertical: SPACING.sm,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
   avatarContainer: {
     alignItems: 'center',
-    marginRight: SPACING.md,
+    marginRight: SPACING.lg,
   },
   levelBadge: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: SPACING.sm,
-    paddingVertical: SPACING.xs,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
     borderRadius: BORDER_RADIUS.md,
     marginTop: -SPACING.sm,
   },
   levelText: {
     color: COLORS.text,
-    fontSize: FONT_SIZES.sm,
+    fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
   },
   barsContainer: {
     flex: 1,
-    gap: SPACING.xs,
+    gap: SPACING.sm,
   },
   barWrapper: {
-    gap: 4,
+    gap: 6,
   },
   barLabelRow: {
     flexDirection: 'row',
@@ -105,14 +105,14 @@ const styles = StyleSheet.create({
   },
   barLabel: {
     color: COLORS.textSecondary,
-    fontSize: FONT_SIZES.xs,
+    fontSize: FONT_SIZES.sm,
   },
   barValue: {
     color: COLORS.textMuted,
-    fontSize: FONT_SIZES.xs,
+    fontSize: FONT_SIZES.sm,
   },
   barBackground: {
-    height: 16,
+    height: 24,
     backgroundColor: COLORS.surfaceLight,
     borderRadius: BORDER_RADIUS.sm,
     overflow: 'hidden',
@@ -130,12 +130,12 @@ const styles = StyleSheet.create({
   goldContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: SPACING.md,
-    gap: SPACING.xs,
+    marginLeft: SPACING.lg,
+    gap: SPACING.sm,
   },
     goldText: {
     color: COLORS.gold,
-    fontSize: FONT_SIZES.md,
+    fontSize: FONT_SIZES.lg,
     fontWeight: 'bold',
   },
 });

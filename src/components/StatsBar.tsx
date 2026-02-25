@@ -5,18 +5,33 @@ import { useAppSelector } from '../store/hooks';
 import { selectPlayerStats, selectXPProgress } from '../store/player/playerSelectors';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 import { CharacterAvatar } from './CharacterAvatar';
+import { SHOP_ITEMS } from '../store/inventory/inventorySlice';
 
 export const StatsBar: React.FC = () => {
   const stats = useAppSelector(selectPlayerStats);
   const xpProgress = useAppSelector(selectXPProgress);
   const characterConfig = useAppSelector((state) => state.character.config);
+  const equippedArmorId = useAppSelector((state) => state.inventory?.equippedArmor);
+  const equippedHeadId = useAppSelector((state) => state.inventory?.equippedHead);
+
+  // Look up sprite key from shop items catalog
+  const getEquippedSpriteKey = (itemId: string | undefined): string | undefined => {
+    if (!itemId) return undefined;
+    const item = SHOP_ITEMS.find((i) => i.id === itemId);
+    return item?.spriteKey;
+  };
 
   const healthPercent = (stats.health / stats.maxHealth) * 100;
 
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        <CharacterAvatar config={characterConfig} size={120} />
+        <CharacterAvatar 
+          config={characterConfig} 
+          size={120}
+          equippedArmor={getEquippedSpriteKey(equippedArmorId)}
+          equippedHead={getEquippedSpriteKey(equippedHeadId)}
+        />
         <View style={styles.levelBadge}>
           <Text style={styles.levelText}>Lv {stats.level}</Text>
         </View>

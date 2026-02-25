@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { HabitsScreen, DailiesScreen, TodosScreen, CharacterScreen } from '../screens';
+import { HabitsScreen, DailiesScreen, TodosScreen, CharacterScreen, RewardsScreen } from '../screens';
 import { StatsBar } from '../components';
 import { COLORS, FONT_SIZES } from '../constants/theme';
 
@@ -29,6 +29,7 @@ export const AppNavigator: React.FC = () => {
             <Tab.Screen name="Habits" component={HabitsScreen} />
             <Tab.Screen name="Dailies" component={DailiesScreen} />
             <Tab.Screen name="To-Dos" component={TodosScreen} />
+            <Tab.Screen name="Rewards" component={RewardsScreen} />
             <Tab.Screen name="Character" component={CharacterScreen} />
           </Tab.Navigator>
         </SafeAreaView>

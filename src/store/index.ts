@@ -7,11 +7,12 @@ import dailiesReducer from './dailies/dailiesSlice';
 import todosReducer from './todos/todosSlice';
 import playerReducer from './player/playerSlice';
 import characterReducer from './character/characterSlice';
+import inventoryReducer from './inventory/inventorySlice';
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['habits', 'dailies', 'todos', 'player', 'character'],
+  whitelist: ['habits', 'dailies', 'todos', 'player', 'character', 'inventory'],
 };
 
 const rootReducer = combineReducers({
@@ -20,6 +21,7 @@ const rootReducer = combineReducers({
   todos: todosReducer,
   player: playerReducer,
   character: characterReducer,
+  inventory: inventoryReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

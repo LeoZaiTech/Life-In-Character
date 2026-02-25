@@ -16,12 +16,12 @@ export interface CharacterConfig {
 }
 
 export const DEFAULT_CHARACTER: CharacterConfig = {
-  skin: '915533',
+  skin: 'c06534',
   size: 'slim',
-  shirt: 'blue',
+  shirt: 'black',
   hairBase: 3,
   hairBangs: 1,
-  hairColor: 'brown',
+  hairColor: 'black',
   hairBeard: 0,
   hairMustache: 0,
   hairFlower: 0,

@@ -14,6 +14,8 @@ import {
   purchaseItem,
   equipArmor,
   equipHead,
+  equipWeapon,
+  setActivePet,
   SHOP_ITEMS,
   ShopItem,
 } from '../store/inventory/inventorySlice';
@@ -22,14 +24,16 @@ import { SPRITES } from '../assets/spriteMap';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 type TabType = 'shop' | 'inventory';
-type FilterType = 'all' | 'armor' | 'head';
+type FilterType = 'all' | 'armor' | 'head' | 'weapon' | 'pet';
 
 export const RewardsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
   const gold = useAppSelector((state) => state.player.stats.gold);
   const ownedItems = useAppSelector((state) => state.inventory.ownedItems);
-  const equippedArmor = useAppSelector((state) => state.inventory.equippedArmor);
-  const equippedHead = useAppSelector((state) => state.inventory.equippedHead);
+  const equippedArmor = useAppSelector((state) => state.inventory?.equippedArmor);
+  const equippedHead = useAppSelector((state) => state.inventory?.equippedHead);
+  const equippedWeapon = useAppSelector((state) => state.inventory?.equippedWeapon);
+  const activePet = useAppSelector((state) => state.inventory?.activePet);
 
   const [activeTab, setActiveTab] = useState<TabType>('shop');
   const [filter, setFilter] = useState<FilterType>('all');
@@ -74,6 +78,18 @@ export const RewardsScreen: React.FC = () => {
       } else {
         dispatch(equipHead(item.id));
       }
+    } else if (item.type === 'weapon') {
+      if (equippedWeapon === item.id) {
+        dispatch(equipWeapon(undefined));
+      } else {
+        dispatch(equipWeapon(item.id));
+      }
+    } else if (item.type === 'pet') {
+      if (activePet === item.id) {
+        dispatch(setActivePet(undefined));
+      } else {
+        dispatch(setActivePet(item.id));
+      }
     }
   };
 
@@ -91,7 +107,9 @@ export const RewardsScreen: React.FC = () => {
 
   const isEquipped = (item: ShopItem) => {
     return (item.type === 'armor' && equippedArmor === item.id) ||
-           (item.type === 'head' && equippedHead === item.id);
+           (item.type === 'head' && equippedHead === item.id) ||
+           (item.type === 'weapon' && equippedWeapon === item.id) ||
+           (item.type === 'pet' && activePet === item.id);
   };
 
   const renderItem = ({ item }: { item: ShopItem }) => {
@@ -132,7 +150,7 @@ export const RewardsScreen: React.FC = () => {
           <View style={styles.itemMeta}>
             <View style={styles.typeTag}>
               <Text style={styles.typeText}>
-                {item.type === 'armor' ? '🛡️' : '👑'} {item.type}
+                {item.type === 'armor' ? '🛡️' : item.type === 'head' ? '👑' : item.type === 'weapon' ? '⚔️' : '🐾'} {item.type}
               </Text>
             </View>
             {equipped && (
@@ -190,14 +208,14 @@ export const RewardsScreen: React.FC = () => {
       </View>
 
       <View style={styles.filterBar}>
-        {(['all', 'armor', 'head'] as FilterType[]).map((f) => (
+        {(['all', 'armor', 'head', 'weapon', 'pet'] as FilterType[]).map((f) => (
           <TouchableOpacity
             key={f}
             style={[styles.filterButton, filter === f && styles.activeFilter]}
             onPress={() => setFilter(f)}
           >
             <Text style={[styles.filterText, filter === f && styles.activeFilterText]}>
-              {f === 'all' ? 'All' : f === 'armor' ? '🛡️ Armor' : '👑 Helmets'}
+              {f === 'all' ? 'All' : f === 'armor' ? '🛡️' : f === 'head' ? '👑' : f === 'weapon' ? '⚔️' : '🐾'}
             </Text>
           </TouchableOpacity>
         ))}

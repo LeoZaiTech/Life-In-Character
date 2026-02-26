@@ -13,6 +13,8 @@ export const StatsBar: React.FC = () => {
   const characterConfig = useAppSelector((state) => state.character.config);
   const equippedArmorId = useAppSelector((state) => state.inventory?.equippedArmor);
   const equippedHeadId = useAppSelector((state) => state.inventory?.equippedHead);
+  const equippedWeaponId = useAppSelector((state) => state.inventory?.equippedWeapon);
+  const activePetId = useAppSelector((state) => state.inventory?.activePet);
 
   // Look up sprite key from shop items catalog
   const getEquippedSpriteKey = (itemId: string | undefined): string | undefined => {
@@ -31,6 +33,8 @@ export const StatsBar: React.FC = () => {
           size={120}
           equippedArmor={getEquippedSpriteKey(equippedArmorId)}
           equippedHead={getEquippedSpriteKey(equippedHeadId)}
+          equippedWeapon={getEquippedSpriteKey(equippedWeaponId)}
+          activePet={getEquippedSpriteKey(activePetId)}
         />
         <View style={styles.levelBadge}>
           <Text style={styles.levelText}>Lv {stats.level}</Text>

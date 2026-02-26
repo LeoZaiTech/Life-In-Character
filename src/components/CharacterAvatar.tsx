@@ -10,6 +10,8 @@ interface CharacterAvatarProps {
   size?: number;
   equippedArmor?: string; // sprite key from inventory
   equippedHead?: string;  // sprite key from inventory
+  equippedWeapon?: string; // sprite key for weapon
+  activePet?: string; // sprite key for pet
 }
 
 export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
@@ -17,6 +19,8 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
   size = 90,
   equippedArmor,
   equippedHead,
+  equippedWeapon,
+  activePet,
 }) => {
   const scale = size / SPRITE_SIZE;
   const scaledSize = SPRITE_SIZE * scale;
@@ -63,34 +67,54 @@ export const CharacterAvatar: React.FC<CharacterAvatarProps> = ({
       layers.push(`hair/hair_flower_${config.hairFlower}`);
     }
 
+    // Equipped weapon renders on top
+    if (equippedWeapon) {
+      layers.push(equippedWeapon);
+    }
+
     return layers;
   };
 
   const layers = getLayers();
 
+  const petSprite = activePet ? getSprite(activePet) : null;
+
   return (
-    <View style={[styles.container, { width: scaledSize, height: scaledSize }]}>
-      {layers.map((layer, index) => {
-        const sprite = getSprite(layer);
-        if (!sprite) return null;
-        
-        return (
-          <Image
-            key={`${layer}-${index}`}
-            source={sprite}
-            style={[
-              styles.sprite,
-              { width: scaledSize, height: scaledSize },
-            ]}
-            resizeMode="contain"
-          />
-        );
-      })}
+    <View style={[styles.wrapper, { width: scaledSize + (petSprite ? scaledSize * 0.5 : 0), height: scaledSize }]}>
+      <View style={[styles.container, { width: scaledSize, height: scaledSize }]}>
+        {layers.map((layer, index) => {
+          const sprite = getSprite(layer);
+          if (!sprite) return null;
+          
+          return (
+            <Image
+              key={`${layer}-${index}`}
+              source={sprite}
+              style={[
+                styles.sprite,
+                { width: scaledSize, height: scaledSize },
+              ]}
+              resizeMode="contain"
+            />
+          );
+        })}
+      </View>
+      {petSprite && (
+        <Image
+          source={petSprite}
+          style={[styles.pet, { width: scaledSize * 0.5, height: scaledSize * 0.5 }]}
+          resizeMode="contain"
+        />
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+  },
   container: {
     position: 'relative',
   },
@@ -98,6 +122,9 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
+  },
+  pet: {
+    marginLeft: -10,
   },
 });
 

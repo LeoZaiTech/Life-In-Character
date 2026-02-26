@@ -1,22 +1,40 @@
-# QuestLife - Gamified Habit Tracker
+# Life In Character - Gamified Habit Tracker
 
-A Habitica-inspired React Native app that turns your daily habits, routines, and tasks into a rewarding RPG experience.
+A Habitica-inspired React Native app that turns your daily habits, routines, and tasks into a rewarding RPG experience with full character customization.
 
 ## Features
 
-- **Habits**: Track flexible behaviors with positive (+) and negative (-) actions
-- **Dailies**: Scheduled repeating tasks with streak tracking
-- **To-Dos**: One-time tasks that persist until completed
-- **Gamification**: XP, levels, gold, and health system
-- **Persistent Storage**: All data saved locally with Redux Persist
+### Task Management
+- **Habits**: Track flexible behaviors with positive (+) and negative (-) actions, with notes
+- **Dailies**: Scheduled repeating tasks with streak tracking and auto-reset
+- **To-Dos**: One-time tasks with optional due dates
+
+### Gamification
+- **XP & Leveling**: Earn XP from tasks, level up every 100 XP
+- **Gold Currency**: Earn gold from tasks, spend in the rewards shop
+- **Health System**: Lose HP for missed dailies or negative habits
+
+### Character System
+- **Avatar Customization**: Skin tones, hair styles/colors, shirts, body types
+- **Equipment Display**: Equipped armor, helmets, and weapons render on avatar
+- **Pets**: Companion pets displayed beside your character (25 available)
+
+### Rewards Shop
+- **4 Item Categories**: Armor (🛡️), Head (👑), Weapons (⚔️), Pets (🐾)
+- **56 Purchasable Items**: Class weapons, armor sets, exotic pets
+- **Equip System**: Buy and equip items to customize your character
+
+### Data Persistence
+- All data saved locally with Redux Persist + AsyncStorage
+- Survives app restarts
 
 ## Tech Stack
 
-- **React Native** (Expo managed workflow)
-- **TypeScript** (strict mode)
-- **Redux Toolkit** (state management)
+- **React Native** with Expo SDK 54 (managed workflow)
+- **TypeScript** (strict mode, all .ts/.tsx)
+- **Redux Toolkit** (6 feature slices)
+- **Redux Persist** + AsyncStorage
 - **React Navigation** (Material Top Tabs)
-- **AsyncStorage** + Redux Persist (data persistence)
 
 ## Getting Started
 
@@ -31,8 +49,8 @@ A Habitica-inspired React Native app that turns your daily habits, routines, and
 
 ```bash
 # Clone the repository
-git clone <your-repo-url>
-cd windsurf-project-5
+git clone https://github.com/LeoZaiTech/Life-In-Character.git
+cd Life-In-Character
 
 # Install dependencies
 npm install
@@ -58,30 +76,34 @@ npm run web
 
 ```
 src/
+├── assets/              # Sprite assets and mapping
+│   └── spriteMap.ts     # 460+ sprite keys
 ├── components/          # Reusable UI components
-│   ├── TaskCard.tsx     # Base card component
-│   ├── HabitCard.tsx    # Habit-specific card with +/- controls
+│   ├── TaskCard.tsx     # Base card with notes support
+│   ├── HabitCard.tsx    # Habit card with +/- controls
 │   ├── DailyCard.tsx    # Daily card with checkbox and streak
 │   ├── TodoCard.tsx     # To-do card with checkbox
-│   ├── StatsBar.tsx     # Player stats display (HP, XP, Gold)
-│   └── AddButton.tsx    # Add new task button
+│   ├── StatsBar.tsx     # Player stats + avatar display
+│   ├── CharacterAvatar.tsx  # Layered sprite renderer
+│   └── Checkbox.tsx     # Reusable checkbox component
 ├── screens/             # Screen components
 │   ├── HabitsScreen.tsx
 │   ├── DailiesScreen.tsx
-│   └── TodosScreen.tsx
-├── store/               # Redux store and slices
-│   ├── index.ts         # Store configuration
-│   ├── hooks.ts         # Typed Redux hooks
-│   ├── habits/          # Habits slice and selectors
-│   ├── dailies/         # Dailies slice and selectors
-│   ├── todos/           # Todos slice and selectors
-│   └── player/          # Player stats slice and selectors
-├── navigation/          # Navigation configuration
-│   └── AppNavigator.tsx
-├── constants/           # Theme and constants
-│   └── theme.ts
-└── types/               # TypeScript types
-    └── index.ts
+│   ├── TodosScreen.tsx
+│   ├── CharacterScreen.tsx  # Avatar customization
+│   └── RewardsScreen.tsx    # Shop and inventory
+├── store/               # Redux store (6 slices)
+│   ├── index.ts         # Store + persist config
+│   ├── hooks.ts         # Typed useSelector/useDispatch
+│   ├── habits/          # Habits slice
+│   ├── dailies/         # Dailies slice
+│   ├── todos/           # Todos slice
+│   ├── player/          # XP, gold, health, level
+│   ├── character/       # Avatar customization
+│   └── inventory/       # Shop items, equipped gear
+├── navigation/          # Tab navigation
+├── constants/           # Theme colors, spacing
+└── types/               # TypeScript interfaces
 ```
 
 ## Architecture Decisions
@@ -105,15 +127,19 @@ Following Habitica's proven model:
 
 **Level Formula**: Level = floor(XP / 100) + 1
 
+## Implemented Features
+
+- [x] Character customization with sprite assets (460+ sprites)
+- [x] Rewards shop with gold purchases (56 items)
+- [x] Daily reset with missed task penalties
+- [x] Pets and weapons system
+- [x] Equipment rendering on avatar
+
 ## Future Enhancements
 
-- [ ] Character customization with sprite assets
-- [ ] Rewards shop with gold purchases
-- [ ] Daily reset with missed task penalties
 - [ ] Animations and sound effects
 - [ ] Cloud sync / user accounts
 - [ ] Social features (parties, challenges)
+- [ ] Achievement system
+- [ ] Quest/challenge mode
 
-## License
-
-MIT

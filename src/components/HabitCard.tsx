@@ -64,6 +64,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   return (
     <TaskCard
       title={habit.title}
+      notes={habit.notes}
       subtitle={getSubtitle()}
       accentColor={getAccentColor()}
       onPress={onPress}

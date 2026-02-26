@@ -58,7 +58,8 @@ export const DailyCard: React.FC<DailyCardProps> = ({
   return (
     <TaskCard
       title={daily.title}
-      subtitle={daily.notes || getDaysText()}
+      notes={daily.notes}
+      subtitle={getDaysText()}
       accentColor={accentColor}
       onPress={onPress}
       leftContent={renderLeftContent()}

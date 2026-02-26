@@ -47,7 +47,8 @@ export const TodoCard: React.FC<TodoCardProps> = ({
   return (
     <TaskCard
       title={todo.title}
-      subtitle={todo.notes || (dueDate ? `Due: ${dueDate}` : undefined)}
+      notes={todo.notes}
+      subtitle={dueDate ? `Due: ${dueDate}` : undefined}
       accentColor={accentColor}
       onPress={onPress}
       leftContent={renderLeftContent()}

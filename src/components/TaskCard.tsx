@@ -4,6 +4,7 @@ import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 
 interface TaskCardProps {
   title: string;
+  notes?: string;
   subtitle?: string;
   accentColor: string;
   onPress?: () => void;
@@ -14,6 +15,7 @@ interface TaskCardProps {
 
 export const TaskCard: React.FC<TaskCardProps> = ({
   title,
+  notes,
   subtitle,
   accentColor,
   onPress,
@@ -34,6 +36,11 @@ export const TaskCard: React.FC<TaskCardProps> = ({
         <Text style={styles.title} numberOfLines={2}>
           {title}
         </Text>
+        {notes && (
+          <Text style={styles.notes} numberOfLines={2}>
+            {notes}
+          </Text>
+        )}
         {subtitle && (
           <Text style={styles.subtitle} numberOfLines={1}>
             {subtitle}
@@ -71,6 +78,12 @@ const styles = StyleSheet.create({
     fontSize: FONT_SIZES.md,
     fontWeight: '600',
     color: COLORS.text,
+  },
+  notes: {
+    fontSize: FONT_SIZES.sm,
+    color: COLORS.textMuted,
+    marginTop: SPACING.xs,
+    fontStyle: 'italic',
   },
   subtitle: {
     fontSize: FONT_SIZES.sm,

@@ -8,3 +8,4 @@ export { ErrorBoundary } from './ErrorBoundary';
 export { CharacterAvatar } from './CharacterAvatar';
 export { TaskOptionsMenu } from './TaskOptionsMenu';
 export { Checkbox } from './Checkbox';
+export { DifficultySelector } from './DifficultySelector';

@@ -13,9 +13,9 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllHabits } from '../store/habits/habitsSelectors';
 import { addHabit, incrementHabit, decrementHabit, deleteHabit, updateHabit } from '../store/habits/habitsSlice';
 import { completePositiveHabit, completeNegativeHabit } from '../store/player/playerSlice';
-import { HabitCard, AddButton } from '../components';
+import { HabitCard, AddButton, DifficultySelector } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
-import { Habit } from '../types';
+import { Habit, Difficulty } from '../types';
 
 export const HabitsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -26,16 +26,17 @@ export const HabitsScreen: React.FC = () => {
   const [positive, setPositive] = useState(true);
   const [negative, setNegative] = useState(true);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
 
   const handleAddHabit = () => {
     if (title.trim()) {
       if (editingHabit) {
         dispatch(updateHabit({
           id: editingHabit.id,
-          updates: { title: title.trim(), notes: notes.trim() || undefined, positive, negative },
+          updates: { title: title.trim(), notes: notes.trim() || undefined, difficulty, positive, negative },
         }));
       } else {
-        dispatch(addHabit({ title: title.trim(), notes: notes.trim() || undefined, positive, negative }));
+        dispatch(addHabit({ title: title.trim(), notes: notes.trim() || undefined, difficulty, positive, negative }));
       }
       resetForm();
     }
@@ -44,6 +45,7 @@ export const HabitsScreen: React.FC = () => {
   const resetForm = () => {
     setTitle('');
     setNotes('');
+    setDifficulty('easy');
     setPositive(true);
     setNegative(true);
     setEditingHabit(null);
@@ -54,14 +56,15 @@ export const HabitsScreen: React.FC = () => {
     setEditingHabit(habit);
     setTitle(habit.title);
     setNotes(habit.notes || '');
+    setDifficulty(habit.difficulty);
     setPositive(habit.positive);
     setNegative(habit.negative);
     setModalVisible(true);
   };
 
-  const handleIncrement = (habitId: string) => {
-    dispatch(incrementHabit(habitId));
-    dispatch(completePositiveHabit());
+  const handleIncrement = (habit: Habit) => {
+    dispatch(incrementHabit(habit.id));
+    dispatch(completePositiveHabit({ difficulty: habit.difficulty, streak: habit.score + 1 }));
   };
 
   const handleDecrement = (habitId: string) => {
@@ -76,7 +79,7 @@ export const HabitsScreen: React.FC = () => {
   const renderItem = ({ item }: { item: Habit }) => (
     <HabitCard
       habit={item}
-      onIncrement={() => handleIncrement(item.id)}
+      onIncrement={() => handleIncrement(item)}
       onDecrement={() => handleDecrement(item.id)}
       onEdit={() => handleEdit(item)}
       onDelete={() => handleDelete(item.id)}
@@ -120,6 +123,8 @@ export const HabitsScreen: React.FC = () => {
               onChangeText={setNotes}
               multiline
             />
+
+            <DifficultySelector value={difficulty} onChange={setDifficulty} />
 
             <View style={styles.switchRow}>
               <Text style={styles.switchLabel}>Positive (+)</Text>

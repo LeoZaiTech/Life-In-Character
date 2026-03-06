@@ -30,6 +30,11 @@ export const COLORS = {
   success: '#48bb78',
   warning: '#ecc94b',
   error: '#f56565',
+  
+  difficultyTrivial: '#a0aec0',
+  difficultyEasy: '#48bb78',
+  difficultyMedium: '#ecc94b',
+  difficultyHard: '#f56565',
 };
 
 export const SPACING = {

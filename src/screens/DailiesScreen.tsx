@@ -12,9 +12,9 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllDailies } from '../store/dailies/dailiesSelectors';
 import { addDaily, toggleDailyComplete, deleteDaily, resetDailies, updateDaily } from '../store/dailies/dailiesSlice';
 import { completeDaily } from '../store/player/playerSlice';
-import { DailyCard, AddButton } from '../components';
+import { DailyCard, AddButton, DifficultySelector } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
-import { Daily } from '../types';
+import { Daily, Difficulty } from '../types';
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
@@ -26,6 +26,7 @@ export const DailiesScreen: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [selectedDays, setSelectedDays] = useState<number[]>([0, 1, 2, 3, 4, 5, 6]);
   const [editingDaily, setEditingDaily] = useState<Daily | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
 
   useEffect(() => {
     dispatch(resetDailies());
@@ -39,6 +40,7 @@ export const DailiesScreen: React.FC = () => {
           updates: {
             title: title.trim(),
             notes: notes.trim() || undefined,
+            difficulty,
             schedule: { repeatDays: selectedDays },
           },
         }));
@@ -46,6 +48,7 @@ export const DailiesScreen: React.FC = () => {
         dispatch(addDaily({
           title: title.trim(),
           notes: notes.trim() || undefined,
+          difficulty,
           schedule: { repeatDays: selectedDays },
         }));
       }
@@ -56,6 +59,7 @@ export const DailiesScreen: React.FC = () => {
   const resetForm = () => {
     setTitle('');
     setNotes('');
+    setDifficulty('easy');
     setSelectedDays([0, 1, 2, 3, 4, 5, 6]);
     setEditingDaily(null);
     setModalVisible(false);
@@ -65,14 +69,15 @@ export const DailiesScreen: React.FC = () => {
     setEditingDaily(daily);
     setTitle(daily.title);
     setNotes(daily.notes || '');
+    setDifficulty(daily.difficulty);
     setSelectedDays(daily.schedule.repeatDays);
     setModalVisible(true);
   };
 
-  const handleToggleComplete = (dailyId: string, wasCompleted: boolean) => {
-    dispatch(toggleDailyComplete(dailyId));
-    if (!wasCompleted) {
-      dispatch(completeDaily());
+  const handleToggleComplete = (daily: Daily) => {
+    dispatch(toggleDailyComplete(daily.id));
+    if (!daily.isCompletedToday) {
+      dispatch(completeDaily({ difficulty: daily.difficulty, streak: daily.streak + 1 }));
     }
   };
 
@@ -91,7 +96,7 @@ export const DailiesScreen: React.FC = () => {
   const renderItem = ({ item }: { item: Daily }) => (
     <DailyCard
       daily={item}
-      onToggleComplete={() => handleToggleComplete(item.id, item.isCompletedToday)}
+      onToggleComplete={() => handleToggleComplete(item)}
       onEdit={() => handleEdit(item)}
       onDelete={() => handleDelete(item.id)}
     />
@@ -134,6 +139,8 @@ export const DailiesScreen: React.FC = () => {
               onChangeText={setNotes}
               multiline
             />
+
+            <DifficultySelector value={difficulty} onChange={setDifficulty} />
 
             <Text style={styles.sectionLabel}>Repeat on:</Text>
             <View style={styles.daysRow}>

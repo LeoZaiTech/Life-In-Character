@@ -3,7 +3,7 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface ShopItem {
   id: string;
   name: string;
-  type: 'armor' | 'head' | 'weapon' | 'pet';
+  type: 'armor' | 'head' | 'weapon' | 'pet' | 'consumable';
   spriteKey: string;
   cost: number;
   description?: string;
@@ -195,4 +195,7 @@ export const SHOP_ITEMS: ShopItem[] = [
   { id: 'pet_egg', name: 'Mystery Egg', type: 'pet', spriteKey: 'pet/Pet-Egg-Base', cost: 25, description: 'What will hatch?' },
   { id: 'pet_flyingpig', name: 'Flying Pig', type: 'pet', spriteKey: 'pet/Pet-FlyingPig-Base', cost: 150, description: 'When pigs fly!' },
   { id: 'pet_mammoth', name: 'Mammoth', type: 'pet', spriteKey: 'pet/Pet-Mammoth-Base', cost: 175, description: 'A woolly mammoth' },
+
+  // Consumables
+  { id: 'consumable_heal', name: 'Heal for Testing', type: 'consumable', spriteKey: '', cost: 0, description: 'Restore HP to full (debug item)' },
 ];

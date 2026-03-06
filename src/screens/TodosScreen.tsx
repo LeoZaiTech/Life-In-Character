@@ -12,9 +12,9 @@ import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { selectAllTodos } from '../store/todos/todosSelectors';
 import { addTodo, toggleTodoComplete, deleteTodo, updateTodo } from '../store/todos/todosSlice';
 import { completeTodo } from '../store/player/playerSlice';
-import { TodoCard, AddButton } from '../components';
+import { TodoCard, AddButton, DifficultySelector } from '../components';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
-import { Todo } from '../types';
+import { Todo, Difficulty } from '../types';
 
 type FilterType = 'active' | 'completed' | 'all';
 
@@ -26,6 +26,7 @@ export const TodosScreen: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [filter, setFilter] = useState<FilterType>('active');
   const [editingTodo, setEditingTodo] = useState<Todo | null>(null);
+  const [difficulty, setDifficulty] = useState<Difficulty>('easy');
 
   const filteredTodos = allTodos.filter((todo) => {
     if (filter === 'active') return !todo.completed;
@@ -41,12 +42,14 @@ export const TodosScreen: React.FC = () => {
           updates: {
             title: title.trim(),
             notes: notes.trim() || undefined,
+            difficulty,
           },
         }));
       } else {
         dispatch(addTodo({
           title: title.trim(),
           notes: notes.trim() || undefined,
+          difficulty,
         }));
       }
       resetForm();
@@ -56,6 +59,7 @@ export const TodosScreen: React.FC = () => {
   const resetForm = () => {
     setTitle('');
     setNotes('');
+    setDifficulty('easy');
     setEditingTodo(null);
     setModalVisible(false);
   };
@@ -64,13 +68,14 @@ export const TodosScreen: React.FC = () => {
     setEditingTodo(todo);
     setTitle(todo.title);
     setNotes(todo.notes || '');
+    setDifficulty(todo.difficulty);
     setModalVisible(true);
   };
 
-  const handleToggleComplete = (todoId: string, wasCompleted: boolean) => {
-    dispatch(toggleTodoComplete(todoId));
-    if (!wasCompleted) {
-      dispatch(completeTodo());
+  const handleToggleComplete = (todo: Todo) => {
+    dispatch(toggleTodoComplete(todo.id));
+    if (!todo.completed) {
+      dispatch(completeTodo(todo.difficulty));
     }
   };
 
@@ -81,7 +86,7 @@ export const TodosScreen: React.FC = () => {
   const renderItem = ({ item }: { item: Todo }) => (
     <TodoCard
       todo={item}
-      onToggleComplete={() => handleToggleComplete(item.id, item.completed)}
+      onToggleComplete={() => handleToggleComplete(item)}
       onEdit={() => handleEdit(item)}
       onDelete={() => handleDelete(item.id)}
     />
@@ -138,6 +143,8 @@ export const TodosScreen: React.FC = () => {
               onChangeText={setNotes}
               multiline
             />
+
+            <DifficultySelector value={difficulty} onChange={setDifficulty} />
 
             <View style={styles.buttonRow}>
               <TouchableOpacity

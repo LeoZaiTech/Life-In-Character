@@ -9,7 +9,7 @@ import {
   Image,
 } from 'react-native';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
-import { addGold } from '../store/player/playerSlice';
+import { addGold, resetHealth } from '../store/player/playerSlice';
 import {
   purchaseItem,
   equipArmor,
@@ -24,7 +24,7 @@ import { SPRITES } from '../assets/spriteMap';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 type TabType = 'shop' | 'inventory';
-type FilterType = 'all' | 'armor' | 'head' | 'weapon' | 'pet';
+type FilterType = 'all' | 'armor' | 'head' | 'weapon' | 'pet' | 'consumable';
 
 export const RewardsScreen: React.FC = () => {
   const dispatch = useAppDispatch();
@@ -39,6 +39,15 @@ export const RewardsScreen: React.FC = () => {
   const [filter, setFilter] = useState<FilterType>('all');
 
   const handlePurchase = (item: ShopItem) => {
+    // Consumables can be used multiple times
+    if (item.type === 'consumable') {
+      if (item.id === 'consumable_heal') {
+        dispatch(resetHealth());
+        Alert.alert('Healed!', 'Your HP has been restored to full.');
+      }
+      return;
+    }
+
     if (ownedItems.includes(item.id)) {
       Alert.alert('Already Owned', 'You already own this item!');
       return;
@@ -150,7 +159,7 @@ export const RewardsScreen: React.FC = () => {
           <View style={styles.itemMeta}>
             <View style={styles.typeTag}>
               <Text style={styles.typeText}>
-                {item.type === 'armor' ? '🛡️' : item.type === 'head' ? '👑' : item.type === 'weapon' ? '⚔️' : '🐾'} {item.type}
+                {item.type === 'armor' ? '🛡️' : item.type === 'head' ? '👑' : item.type === 'weapon' ? '⚔️' : item.type === 'pet' ? '🐾' : '🧪'} {item.type}
               </Text>
             </View>
             {equipped && (
@@ -162,7 +171,11 @@ export const RewardsScreen: React.FC = () => {
         </View>
 
         <View style={styles.priceContainer}>
-          {activeTab === 'shop' && !owned ? (
+          {item.type === 'consumable' ? (
+            <View style={styles.ownedTag}>
+              <Text style={styles.ownedText}>USE</Text>
+            </View>
+          ) : activeTab === 'shop' && !owned ? (
             <View style={[styles.priceTag, !canAfford && styles.cantAfford]}>
               <FontAwesome5 name="coins" size={14} color={canAfford ? COLORS.gold : COLORS.textMuted} />
               <Text style={[styles.priceText, !canAfford && styles.cantAffordText]}>
@@ -208,14 +221,14 @@ export const RewardsScreen: React.FC = () => {
       </View>
 
       <View style={styles.filterBar}>
-        {(['all', 'armor', 'head', 'weapon', 'pet'] as FilterType[]).map((f) => (
+        {(['all', 'armor', 'head', 'weapon', 'pet', 'consumable'] as FilterType[]).map((f) => (
           <TouchableOpacity
             key={f}
             style={[styles.filterButton, filter === f && styles.activeFilter]}
             onPress={() => setFilter(f)}
           >
             <Text style={[styles.filterText, filter === f && styles.activeFilterText]}>
-              {f === 'all' ? 'All' : f === 'armor' ? '🛡️' : f === 'head' ? '👑' : f === 'weapon' ? '⚔️' : '🐾'}
+              {f === 'all' ? 'All' : f === 'armor' ? '🛡️' : f === 'head' ? '👑' : f === 'weapon' ? '⚔️' : f === 'pet' ? '🐾' : '🧪'}
             </Text>
           </TouchableOpacity>
         ))}

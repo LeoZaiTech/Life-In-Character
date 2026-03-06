@@ -1,9 +1,19 @@
 import React from 'react';
-import { Todo } from '../types';
+import { Todo, Difficulty } from '../types';
 import { TaskCard } from './TaskCard';
 import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { Checkbox } from './Checkbox';
 import { COLORS } from '../constants/theme';
+
+const getDifficultyColor = (difficulty: Difficulty): string => {
+  switch (difficulty) {
+    case 'trivial': return COLORS.difficultyTrivial;
+    case 'easy': return COLORS.difficultyEasy;
+    case 'medium': return COLORS.difficultyMedium;
+    case 'hard': return COLORS.difficultyHard;
+    default: return COLORS.difficultyEasy;
+  }
+};
 
 interface TodoCardProps {
   todo: Todo;
@@ -20,7 +30,9 @@ export const TodoCard: React.FC<TodoCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const accentColor = todo.completed ? COLORS.todoComplete : COLORS.todoActive;
+  const accentColor = todo.completed 
+    ? COLORS.todoComplete 
+    : getDifficultyColor(todo.difficulty);
 
   const renderLeftContent = () => (
     <Checkbox

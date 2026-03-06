@@ -1,10 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Daily } from '../types';
+import { Daily, Difficulty } from '../types';
 import { TaskCard } from './TaskCard';
 import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { Checkbox } from './Checkbox';
 import { COLORS, SPACING, FONT_SIZES } from '../constants/theme';
+
+const getDifficultyColor = (difficulty: Difficulty): string => {
+  switch (difficulty) {
+    case 'trivial': return COLORS.difficultyTrivial;
+    case 'easy': return COLORS.difficultyEasy;
+    case 'medium': return COLORS.difficultyMedium;
+    case 'hard': return COLORS.difficultyHard;
+    default: return COLORS.difficultyEasy;
+  }
+};
 
 interface DailyCardProps {
   daily: Daily;
@@ -21,7 +31,9 @@ export const DailyCard: React.FC<DailyCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const accentColor = daily.isCompletedToday ? COLORS.dailyComplete : COLORS.dailyActive;
+  const accentColor = daily.isCompletedToday 
+    ? COLORS.dailyComplete 
+    : getDifficultyColor(daily.difficulty);
 
   const renderLeftContent = () => (
     <Checkbox

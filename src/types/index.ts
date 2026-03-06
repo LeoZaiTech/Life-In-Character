@@ -2,6 +2,7 @@ export interface Habit {
   id: string;
   title: string;
   notes?: string;
+  difficulty: Difficulty;
   positive: boolean;
   negative: boolean;
   score: number;
@@ -14,6 +15,7 @@ export interface Daily {
   id: string;
   title: string;
   notes?: string;
+  difficulty: Difficulty;
   isCompletedToday: boolean;
   streak: number;
   schedule: {
@@ -27,6 +29,7 @@ export interface Todo {
   id: string;
   title: string;
   notes?: string;
+  difficulty: Difficulty;
   completed: boolean;
   dueDate?: string;
   createdAt: string;
@@ -50,9 +53,12 @@ export interface CharacterCustomization {
 
 export type TaskType = 'habit' | 'daily' | 'todo';
 
+export type Difficulty = 'trivial' | 'easy' | 'medium' | 'hard';
+
 export interface CreateHabitPayload {
   title: string;
   notes?: string;
+  difficulty?: Difficulty;
   positive: boolean;
   negative: boolean;
 }
@@ -60,6 +66,7 @@ export interface CreateHabitPayload {
 export interface CreateDailyPayload {
   title: string;
   notes?: string;
+  difficulty?: Difficulty;
   schedule: {
     repeatDays: number[];
   };
@@ -68,5 +75,6 @@ export interface CreateDailyPayload {
 export interface CreateTodoPayload {
   title: string;
   notes?: string;
+  difficulty?: Difficulty;
   dueDate?: string;
 }

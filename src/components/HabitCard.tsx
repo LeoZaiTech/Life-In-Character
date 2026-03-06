@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Habit } from '../types';
+import { Habit, Difficulty } from '../types';
 import { TaskCard } from './TaskCard';
 import { TaskOptionsMenu } from './TaskOptionsMenu';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
@@ -14,6 +14,16 @@ interface HabitCardProps {
   onDelete?: () => void;
 }
 
+const getDifficultyColor = (difficulty: Difficulty): string => {
+  switch (difficulty) {
+    case 'trivial': return COLORS.difficultyTrivial;
+    case 'easy': return COLORS.difficultyEasy;
+    case 'medium': return COLORS.difficultyMedium;
+    case 'hard': return COLORS.difficultyHard;
+    default: return COLORS.difficultyEasy;
+  }
+};
+
 export const HabitCard: React.FC<HabitCardProps> = ({
   habit,
   onIncrement,
@@ -22,11 +32,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
   onEdit,
   onDelete,
 }) => {
-  const getAccentColor = () => {
-    if (habit.positive && habit.negative) return COLORS.habitBoth;
-    if (habit.positive) return COLORS.habitPositive;
-    return COLORS.habitNegative;
-  };
+  const accentColor = getDifficultyColor(habit.difficulty);
 
   const renderLeftContent = () => (
     <View style={styles.buttonContainer}>
@@ -66,7 +72,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({
       title={habit.title}
       notes={habit.notes}
       subtitle={getSubtitle()}
-      accentColor={getAccentColor()}
+      accentColor={accentColor}
       onPress={onPress}
       leftContent={renderLeftContent()}
       rightContent={renderRightContent()}

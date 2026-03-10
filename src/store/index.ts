@@ -1,4 +1,4 @@
-import { configureStore, combineReducers, createAction } from '@reduxjs/toolkit';
+import { configureStore, combineReducers, createAction, Middleware } from '@reduxjs/toolkit';
 import { persistStore, persistReducer } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -11,13 +11,20 @@ import inventoryReducer from './inventory/inventorySlice';
 import authReducer from './auth/authSlice';
 import { userDataService, UserGameData } from '../services/userDataService';
 
+// Slices that contain user game data (should trigger auto-save)
+const USER_DATA_SLICES = ['habits', 'dailies', 'todos', 'player', 'character', 'inventory'];
+
+// Debounce timer for auto-save
+let saveTimeout: NodeJS.Timeout | null = null;
+const SAVE_DEBOUNCE_MS = 1000;
+
 export const loadUserData = createAction<UserGameData>('global/loadUserData');
 export const clearUserData = createAction('global/clearUserData');
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  whitelist: ['habits', 'dailies', 'todos', 'player', 'character', 'inventory'],
+  whitelist: [], // User data persisted via userDataService per-user
 };
 
 const appReducer = combineReducers({
@@ -46,14 +53,77 @@ const rootReducer = (state: ReturnType<typeof appReducer> | undefined, action: a
   }
   
   if (clearUserData.match(action)) {
-    console.log('[Store] Clearing user data from state');
-    return appReducer(undefined, action);
+    console.log('[Store] Clearing user data from state (preserving auth)');
+    const freshState = appReducer(undefined, action);
+    return {
+      ...freshState,
+      auth: state?.auth ?? freshState.auth,
+    };
   }
   
   return appReducer(state, action);
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+// Auto-save middleware - saves user data when game state changes
+const autoSaveMiddleware: Middleware = (storeApi) => (next) => (action: any) => {
+  const result = next(action);
+  
+  // Check if action affects user data slices
+  const actionType = action?.type as string;
+  if (!actionType) return result;
+  
+  const sliceName = actionType.split('/')[0];
+  const isUserDataAction = USER_DATA_SLICES.includes(sliceName);
+  
+  // Debug: Log all game-related actions
+  if (isUserDataAction) {
+    console.log('[AutoSave] Detected game action:', actionType);
+  }
+  
+  // Skip if not a user data action, or if it's a load/clear action
+  if (!isUserDataAction || actionType.startsWith('global/')) {
+    return result;
+  }
+  
+  const state = storeApi.getState() as any;
+  const userId = state.auth?.user?.id;
+  
+  // Only auto-save if user is authenticated
+  if (!userId || !state.auth?.isAuthenticated) {
+    console.log('[AutoSave] Skipping - not authenticated. userId:', userId, 'isAuth:', state.auth?.isAuthenticated);
+    return result;
+  }
+  
+  console.log('[AutoSave] Scheduling save for user:', userId, 'action:', actionType);
+  
+  // Debounce the save
+  if (saveTimeout) {
+    clearTimeout(saveTimeout);
+  }
+  
+  saveTimeout = setTimeout(async () => {
+    try {
+      const currentState = storeApi.getState() as any;
+      const userData: UserGameData = {
+        habits: currentState.habits,
+        dailies: currentState.dailies,
+        todos: currentState.todos,
+        player: currentState.player,
+        character: currentState.character,
+        inventory: currentState.inventory,
+      };
+      console.log('[AutoSave] Executing save for:', userId, 'player gold:', currentState.player?.stats?.gold);
+      await userDataService.saveUserData(userId, userData);
+      console.log('[AutoSave] ✓ Save completed for:', userId);
+    } catch (error) {
+      console.error('[AutoSave] ✗ Failed to save user data:', error);
+    }
+  }, SAVE_DEBOUNCE_MS);
+  
+  return result;
+};
 
 export const store = configureStore({
   reducer: persistedReducer,
@@ -62,7 +132,7 @@ export const store = configureStore({
       serializableCheck: {
         ignoredActions: ['persist/PERSIST', 'persist/REHYDRATE', 'global/loadUserData', 'global/clearUserData'],
       },
-    }),
+    }).concat(autoSaveMiddleware),
 });
 
 export const persistor = persistStore(store);

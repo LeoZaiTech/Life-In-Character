@@ -7,6 +7,7 @@ import {
 } from '../../types/auth';
 import { authService } from '../../services/authService';
 import { userDataService, UserGameData } from '../../services/userDataService';
+import { clearUserData, loadUserData } from '../index';
 
 const initialState: AuthState = {
   user: null,
@@ -18,9 +19,20 @@ const initialState: AuthState = {
 
 export const initializeAuth = createAsyncThunk(
   'auth/initialize',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
       const result = await authService.checkAuthStatus();
+      
+      // If user is authenticated, load their data
+      if (result.isAuthenticated && result.user) {
+        console.log('[AuthSlice] User already authenticated, loading data for:', result.user.id);
+        const userData = await userDataService.loadUserData(result.user.id);
+        if (userData) {
+          dispatch(loadUserData(userData));
+          console.log('[AuthSlice] User data loaded on init');
+        }
+      }
+      
       return result;
     } catch (error) {
       return rejectWithValue('Failed to initialize authentication');
@@ -30,15 +42,24 @@ export const initializeAuth = createAsyncThunk(
 
 export const login = createAsyncThunk(
   'auth/login',
-  async (credentials: LoginCredentials, { rejectWithValue }) => {
+  async (credentials: LoginCredentials, { rejectWithValue, dispatch }) => {
     try {
       const response = await authService.login(credentials);
-      console.log('[AuthSlice] Login successful, loading user data for:', response.user.id);
+      console.log('[AuthSlice] === LOGIN START ===');
+      console.log('[AuthSlice] User ID:', response.user.id);
       
       const userData = await userDataService.loadUserData(response.user.id);
-      console.log('[AuthSlice] User data loaded:', userData ? 'Found' : 'New user');
+      console.log('[AuthSlice] User data found:', userData ? 'YES' : 'NO (new user)');
       
-      return { user: response.user, userData };
+      // Load user data into state if found
+      if (userData) {
+        console.log('[AuthSlice] Loading player stats:', JSON.stringify((userData as any).player?.stats));
+        console.log('[AuthSlice] Loading character:', (userData as any).character?.name);
+        dispatch(loadUserData(userData));
+        console.log('[AuthSlice] === LOGIN LOAD COMPLETE ===');
+      }
+      
+      return response.user;
     } catch (error) {
       return rejectWithValue('Invalid email or password');
     }
@@ -47,15 +68,18 @@ export const login = createAsyncThunk(
 
 export const signup = createAsyncThunk(
   'auth/signup',
-  async (credentials: SignupCredentials, { rejectWithValue }) => {
+  async (credentials: SignupCredentials, { rejectWithValue, dispatch }) => {
     console.log('[AuthSlice] signup thunk started');
     try {
+      // Clear existing user data so new user starts fresh
+      dispatch(clearUserData());
+      console.log('[AuthSlice] Cleared state for new user');
+      
       const response = await authService.signup(credentials);
       console.log('[AuthSlice] signup successful, user:', response.user);
       return response.user;
     } catch (error) {
       console.error('[AuthSlice] signup thunk error:', error);
-      console.error('[AuthSlice] error type:', typeof error);
       console.error('[AuthSlice] error message:', error instanceof Error ? error.message : String(error));
       return rejectWithValue('Failed to create account. Please try again.');
     }
@@ -70,7 +94,11 @@ export const logout = createAsyncThunk(
       const userId = state.auth?.user?.id;
       
       if (userId) {
-        console.log('[AuthSlice] Saving user data before logout for:', userId);
+        console.log('[AuthSlice] === LOGOUT SAVE START ===');
+        console.log('[AuthSlice] User ID:', userId);
+        console.log('[AuthSlice] Current player stats:', JSON.stringify(state.player?.stats));
+        console.log('[AuthSlice] Current character:', state.character?.name);
+        
         const userData: UserGameData = {
           habits: state.habits,
           dailies: state.dailies,
@@ -79,12 +107,19 @@ export const logout = createAsyncThunk(
           character: state.character,
           inventory: state.inventory,
         };
+        
         await userDataService.saveUserData(userId, userData);
-        console.log('[AuthSlice] User data saved successfully');
+        console.log('[AuthSlice] === LOGOUT SAVE COMPLETE ===');
+        
+        // Debug: Verify what's in storage
+        await userDataService.debugDumpStorage();
       }
       
       await authService.logout();
-      console.log('[AuthSlice] Logout complete');
+      
+      // Clear user data after saving
+      dispatch(clearUserData());
+      console.log('[AuthSlice] Logout complete, state cleared');
     } catch (error) {
       console.error('[AuthSlice] Logout error:', error);
       return rejectWithValue('Failed to logout');
@@ -128,7 +163,7 @@ const authSlice = createSlice({
       })
       .addCase(login.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.user = action.payload.user;
+        state.user = action.payload;
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -153,15 +188,19 @@ const authSlice = createSlice({
       })
       // Logout
       .addCase(logout.pending, (state) => {
+        console.log('[AuthSlice] logout.pending');
         state.isLoading = true;
       })
       .addCase(logout.fulfilled, (state) => {
+        console.log('[AuthSlice] logout.fulfilled');
         state.isLoading = false;
         state.user = null;
         state.isAuthenticated = false;
         state.error = null;
+        state.isInitialized = true; // Keep initialized
       })
       .addCase(logout.rejected, (state, action) => {
+        console.log('[AuthSlice] logout.rejected:', action.payload);
         state.isLoading = false;
         state.error = action.payload as string;
       });

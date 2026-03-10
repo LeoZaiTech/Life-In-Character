@@ -47,4 +47,24 @@ export const userDataService = {
       .filter(key => key.startsWith(USER_DATA_PREFIX))
       .map(key => key.replace(USER_DATA_PREFIX, ''));
   },
+
+  async debugDumpStorage(): Promise<void> {
+    console.log('[UserDataService] === DEBUG STORAGE DUMP ===');
+    const keys = await AsyncStorage.getAllKeys();
+    console.log('[UserDataService] All keys:', keys);
+    
+    for (const key of keys) {
+      if (key.startsWith(USER_DATA_PREFIX)) {
+        const data = await AsyncStorage.getItem(key);
+        if (data) {
+          const parsed = JSON.parse(data);
+          console.log(`[UserDataService] ${key}:`);
+          console.log('  - Player stats:', JSON.stringify(parsed.player?.stats));
+          console.log('  - Character:', parsed.character?.name);
+          console.log('  - Habits count:', parsed.habits?.items?.length || 0);
+        }
+      }
+    }
+    console.log('[UserDataService] === END DUMP ===');
+  },
 };

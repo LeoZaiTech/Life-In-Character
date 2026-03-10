@@ -14,6 +14,7 @@ import {
   setShirt,
   setBodySize,
 } from '../store/character/characterSlice';
+import { logout } from '../store/auth/authSlice';
 import { CharacterAvatar } from '../components/CharacterAvatar';
 import { COLORS, SPACING, FONT_SIZES, BORDER_RADIUS } from '../constants/theme';
 import { SKIN_OPTIONS, HAIR_COLORS, SHIRT_COLORS, HairColor } from '../types/character';
@@ -314,6 +315,12 @@ export const CharacterScreen: React.FC = () => {
             {showSaved ? '✓ Saved!' : 'Save Character'}
           </Text>
         </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => dispatch(logout())}
+        >
+          <Text style={styles.logoutButtonText}>Sign Out</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -469,5 +476,18 @@ const styles = StyleSheet.create({
     color: COLORS.text,
     fontSize: FONT_SIZES.md,
     fontWeight: 'bold',
+  },
+  logoutButton: {
+    marginTop: SPACING.sm,
+    paddingVertical: SPACING.sm,
+    borderRadius: BORDER_RADIUS.md,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.error,
+  },
+  logoutButtonText: {
+    color: COLORS.error,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
   },
 });

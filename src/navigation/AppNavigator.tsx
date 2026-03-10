@@ -1,38 +1,100 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { HabitsScreen, DailiesScreen, TodosScreen, CharacterScreen, RewardsScreen } from '../screens';
+import { HabitsScreen, DailiesScreen, TodosScreen, CharacterScreen, RewardsScreen, LoginScreen, SignupScreen, ProfileScreen } from '../screens';
 import { StatsBar } from '../components';
 import { COLORS, FONT_SIZES } from '../constants/theme';
+import { useAppDispatch, useAppSelector } from '../store/hooks';
+import { initializeAuth } from '../store/auth/authSlice';
+import { loadUserDataForUser } from '../store';
 
 const Tab = createMaterialTopTabNavigator();
 
+type AuthScreen = 'login' | 'signup';
+
+const AuthNavigator: React.FC = () => {
+  const [currentScreen, setCurrentScreen] = useState<AuthScreen>('login');
+
+  if (currentScreen === 'login') {
+    return <LoginScreen onNavigateToSignup={() => setCurrentScreen('signup')} />;
+  }
+
+  return <SignupScreen onNavigateToLogin={() => setCurrentScreen('login')} />;
+};
+
+const MainNavigator: React.FC = () => {
+  return (
+    <SafeAreaView style={styles.container} edges={['top']}>
+      <View style={styles.header}>
+        <StatsBar />
+      </View>
+      <Tab.Navigator
+        screenOptions={{
+          tabBarStyle: styles.tabBar,
+          tabBarLabelStyle: styles.tabLabel,
+          tabBarIndicatorStyle: styles.tabIndicator,
+          tabBarActiveTintColor: COLORS.text,
+          tabBarInactiveTintColor: COLORS.textMuted,
+        }}
+      >
+        <Tab.Screen name="Habits" component={HabitsScreen} />
+        <Tab.Screen name="Dailies" component={DailiesScreen} />
+        <Tab.Screen name="To-Dos" component={TodosScreen} />
+        <Tab.Screen name="Rewards" component={RewardsScreen} />
+        <Tab.Screen name="Character" component={CharacterScreen} />
+        <Tab.Screen name="Profile" component={ProfileScreen} />
+      </Tab.Navigator>
+    </SafeAreaView>
+  );
+};
+
+const LoadingScreen: React.FC = () => (
+  <View style={styles.loadingContainer}>
+    <ActivityIndicator size="large" color={COLORS.primary} />
+  </View>
+);
+
 export const AppNavigator: React.FC = () => {
+  const dispatch = useAppDispatch();
+  const { isAuthenticated, isInitialized, isLoading, user } = useAppSelector((state) => state.auth);
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  useEffect(() => {
+    dispatch(initializeAuth());
+  }, [dispatch]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (isAuthenticated && user?.id && !dataLoaded) {
+        console.log('[AppNavigator] Loading user data for:', user.email);
+        await loadUserDataForUser(user.id);
+        setDataLoaded(true);
+      }
+      if (!isAuthenticated) {
+        setDataLoaded(false);
+      }
+    };
+    loadData();
+  }, [isAuthenticated, user?.id, dataLoaded]);
+
+  const renderContent = () => {
+    if (!isInitialized || isLoading) {
+      return <LoadingScreen />;
+    }
+
+    if (!isAuthenticated) {
+      return <AuthNavigator />;
+    }
+
+    return <MainNavigator />;
+  };
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <View style={styles.header}>
-            <StatsBar />
-          </View>
-          <Tab.Navigator
-            screenOptions={{
-              tabBarStyle: styles.tabBar,
-              tabBarLabelStyle: styles.tabLabel,
-              tabBarIndicatorStyle: styles.tabIndicator,
-              tabBarActiveTintColor: COLORS.text,
-              tabBarInactiveTintColor: COLORS.textMuted,
-            }}
-          >
-            <Tab.Screen name="Habits" component={HabitsScreen} />
-            <Tab.Screen name="Dailies" component={DailiesScreen} />
-            <Tab.Screen name="To-Dos" component={TodosScreen} />
-            <Tab.Screen name="Rewards" component={RewardsScreen} />
-            <Tab.Screen name="Character" component={CharacterScreen} />
-          </Tab.Navigator>
-        </SafeAreaView>
+        {renderContent()}
       </NavigationContainer>
     </SafeAreaProvider>
   );
@@ -41,6 +103,12 @@ export const AppNavigator: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: COLORS.background,
   },
   header: {

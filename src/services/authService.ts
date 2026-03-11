@@ -22,7 +22,20 @@ const SECURE_STORE_KEYS = {
   USER_DATA: 'auth_user_data',
 };
 
+const STORAGE_KEYS = {
+  REGISTERED_USERS: 'auth_registered_users',
+};
+
 const TOKEN_EXPIRY_DURATION = 24 * 60 * 60 * 1000; // 24 hours in ms
+
+type StoredUserRecord = {
+  id: string;
+  email: string;
+  username: string;
+  password: string;
+  createdAt: string;
+  lastLoginAt: string;
+};
 
 const secureStorage = {
   async setItem(key: string, value: string): Promise<void> {
@@ -65,6 +78,31 @@ const secureStorage = {
       await AsyncStorage.removeItem(key);
     }
   },
+};
+
+const normalizeEmail = (email: string) => email.trim().toLowerCase();
+
+const toPublicUser = (record: StoredUserRecord): User => ({
+  id: record.id,
+  email: record.email,
+  username: record.username,
+  createdAt: record.createdAt,
+  lastLoginAt: record.lastLoginAt,
+});
+
+const getStoredUsers = async (): Promise<StoredUserRecord[]> => {
+  try {
+    const raw = await AsyncStorage.getItem(STORAGE_KEYS.REGISTERED_USERS);
+    if (!raw) return [];
+    return JSON.parse(raw) as StoredUserRecord[];
+  } catch (error) {
+    console.error('[AuthService] Failed to read stored users:', error);
+    return [];
+  }
+};
+
+const saveStoredUsers = async (users: StoredUserRecord[]): Promise<void> => {
+  await AsyncStorage.setItem(STORAGE_KEYS.REGISTERED_USERS, JSON.stringify(users));
 };
 
 export const authService = {
@@ -130,17 +168,28 @@ export const authService = {
     // Simulate API call delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // In production, this would call your actual API
-    // For now, we simulate a successful login
-    const user: User = {
-      id: generateUUID(),
-      email: credentials.email,
-      username: credentials.email.split('@')[0],
-      createdAt: new Date().toISOString(),
-      lastLoginAt: new Date().toISOString(),
-    };
+    const normalizedEmail = normalizeEmail(credentials.email);
+    const users = await getStoredUsers();
 
+    const existingUser = users.find(
+      (user) => user.email === normalizedEmail && user.password === credentials.password
+    );
+
+    if (!existingUser) {
+      throw new Error('Invalid email or password');
+    }
+
+    // Update last login time
+    existingUser.lastLoginAt = new Date().toISOString();
+    await saveStoredUsers(users);
+
+    const user = toPublicUser(existingUser);
     const tokens = this.generateMockTokens();
+
+    console.log('[AuthService] Login using existing user:', {
+      id: user.id,
+      email: user.email,
+    });
 
     // Store securely
     await this.storeTokens(tokens);
@@ -157,26 +206,41 @@ export const authService = {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       console.log('[AuthService] API delay complete');
 
-      // In production, this would call your actual API
-      const user: User = {
+      const normalizedEmail = normalizeEmail(credentials.email);
+      const users = await getStoredUsers();
+
+      // Check if user already exists
+      const existingUser = users.find((user) => user.email === normalizedEmail);
+      if (existingUser) {
+        throw new Error('An account with this email already exists');
+      }
+
+      const now = new Date().toISOString();
+
+      // Create new user record with stable ID
+      const newUserRecord: StoredUserRecord = {
         id: generateUUID(),
-        email: credentials.email,
+        email: normalizedEmail,
         username: credentials.username,
-        createdAt: new Date().toISOString(),
-        lastLoginAt: new Date().toISOString(),
+        password: credentials.password,
+        createdAt: now,
+        lastLoginAt: now,
       };
-      console.log('[AuthService] User object created:', user);
 
+      // Save to registered users list
+      users.push(newUserRecord);
+      await saveStoredUsers(users);
+
+      const user = toPublicUser(newUserRecord);
       const tokens = this.generateMockTokens();
-      console.log('[AuthService] Tokens generated');
 
-      console.log('[AuthService] Storing tokens...');
+      console.log('[AuthService] Signup created persistent user:', {
+        id: user.id,
+        email: user.email,
+      });
+
       await this.storeTokens(tokens);
-      console.log('[AuthService] Tokens stored successfully');
-      
-      console.log('[AuthService] Storing user...');
       await this.storeUser(user);
-      console.log('[AuthService] User stored successfully');
 
       console.log('[AuthService] Signup complete, returning response');
       return { user, tokens };

@@ -18,9 +18,18 @@ export const userDataService = {
 
   async saveUserData(userId: string, data: UserGameData): Promise<void> {
     const key = this.getStorageKey(userId);
-    console.log('[UserDataService] Saving data for user:', userId);
-    await AsyncStorage.setItem(key, JSON.stringify(data));
-    console.log('[UserDataService] Data saved successfully');
+    const serialized = JSON.stringify(data);
+
+    console.log('[UserDataService] Saving data for user:', userId, 'key:', key);
+    await AsyncStorage.setItem(key, serialized);
+
+    // Verify write was successful
+    const verify = await AsyncStorage.getItem(key);
+    if (verify !== serialized) {
+      throw new Error(`[UserDataService] Verification failed for key ${key}`);
+    }
+
+    console.log('[UserDataService] Data saved successfully and verified');
   },
 
   async loadUserData(userId: string): Promise<UserGameData | null> {

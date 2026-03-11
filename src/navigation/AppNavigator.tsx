@@ -1,21 +1,29 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { HabitsScreen, DailiesScreen, TodosScreen, CharacterScreen, RewardsScreen, LoginScreen, SignupScreen, ProfileScreen } from '../screens';
+import {
+  HabitsScreen,
+  DailiesScreen,
+  TodosScreen,
+  CharacterScreen,
+  RewardsScreen,
+  LoginScreen,
+  SignupScreen,
+  ProfileScreen,
+} from '../screens';
 import { StatsBar } from '../components';
 import { COLORS, FONT_SIZES } from '../constants/theme';
 import { useAppDispatch, useAppSelector } from '../store/hooks';
 import { initializeAuth } from '../store/auth/authSlice';
-import { loadUserDataForUser } from '../store';
 
 const Tab = createMaterialTopTabNavigator();
 
 type AuthScreen = 'login' | 'signup';
 
 const AuthNavigator: React.FC = () => {
-  const [currentScreen, setCurrentScreen] = useState<AuthScreen>('login');
+  const [currentScreen, setCurrentScreen] = React.useState<AuthScreen>('login');
 
   if (currentScreen === 'login') {
     return <LoginScreen onNavigateToSignup={() => setCurrentScreen('signup')} />;
@@ -58,26 +66,11 @@ const LoadingScreen: React.FC = () => (
 
 export const AppNavigator: React.FC = () => {
   const dispatch = useAppDispatch();
-  const { isAuthenticated, isInitialized, isLoading, user } = useAppSelector((state) => state.auth);
-  const [dataLoaded, setDataLoaded] = useState(false);
+  const { isAuthenticated, isInitialized, isLoading } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
     dispatch(initializeAuth());
   }, [dispatch]);
-
-  useEffect(() => {
-    const loadData = async () => {
-      if (isAuthenticated && user?.id && !dataLoaded) {
-        console.log('[AppNavigator] Loading user data for:', user.email);
-        await loadUserDataForUser(user.id);
-        setDataLoaded(true);
-      }
-      if (!isAuthenticated) {
-        setDataLoaded(false);
-      }
-    };
-    loadData();
-  }, [isAuthenticated, user?.id, dataLoaded]);
 
   const renderContent = () => {
     if (!isInitialized || isLoading) {

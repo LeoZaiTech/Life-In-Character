@@ -6,8 +6,13 @@ import {
   SignupCredentials,
 } from '../../types/auth';
 import { authService } from '../../services/authService';
-import { userDataService, UserGameData } from '../../services/userDataService';
-import { clearUserData, loadUserData } from '../index';
+import { userDataService } from '../../services/userDataService';
+import {
+  clearUserData,
+  loadUserData,
+  cancelPendingAutoSave,
+  flushCurrentUserData,
+} from '../index';
 
 const initialState: AuthState = {
   user: null,
@@ -88,36 +93,24 @@ export const signup = createAsyncThunk(
 
 export const logout = createAsyncThunk(
   'auth/logout',
-  async (_, { rejectWithValue, getState, dispatch }) => {
+  async (_, { rejectWithValue, dispatch }) => {
     try {
-      const state = getState() as any;
-      const userId = state.auth?.user?.id;
-      
-      if (userId) {
-        console.log('[AuthSlice] === LOGOUT SAVE START ===');
-        console.log('[AuthSlice] User ID:', userId);
-        console.log('[AuthSlice] Current player stats:', JSON.stringify(state.player?.stats));
-        console.log('[AuthSlice] Current character:', state.character?.name);
-        
-        const userData: UserGameData = {
-          habits: state.habits,
-          dailies: state.dailies,
-          todos: state.todos,
-          player: state.player,
-          character: state.character,
-          inventory: state.inventory,
-        };
-        
-        await userDataService.saveUserData(userId, userData);
-        console.log('[AuthSlice] === LOGOUT SAVE COMPLETE ===');
-        
-        // Debug: Verify what's in storage
-        await userDataService.debugDumpStorage();
-      }
-      
+      console.log('[AuthSlice] === LOGOUT START ===');
+
+      // Prevent a pending debounced save from firing after state reset
+      cancelPendingAutoSave();
+
+      // Force one final immediate save using the current authenticated user + current state
+      await flushCurrentUserData();
+      console.log('[AuthSlice] === LOGOUT SAVE COMPLETE ===');
+
+      // Optional debug verification
+      await userDataService.debugDumpStorage();
+
+      // Clear auth/session storage
       await authService.logout();
-      
-      // Clear user data after saving
+
+      // Clear in-memory game data only after save is fully done
       dispatch(clearUserData());
       console.log('[AuthSlice] Logout complete, state cleared');
     } catch (error) {
